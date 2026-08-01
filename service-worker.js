@@ -1,5 +1,5 @@
 // Service Worker for PWA offline caching
-const CACHE_NAME = 'geoportal-cache-v1';
+const CACHE_NAME = 'geoportal-cache-v2';
 const URLs_TO_CACHE = [
   './',
   './index.html',

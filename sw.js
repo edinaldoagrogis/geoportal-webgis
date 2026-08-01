@@ -1,4 +1,4 @@
-const CACHE_NAME = 'geoportal-v1';
+const CACHE_NAME = 'geoportal-v2';
 const TILE_CACHE = 'map-tiles-cache';
 
 // Assets to cache immediately on install
