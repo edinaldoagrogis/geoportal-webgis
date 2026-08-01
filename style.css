@@ -1,0 +1,507 @@
+:root {
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --bg-color: #0f172a;
+    --panel-bg: rgba(15, 23, 42, 0.85);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --accent: #10b981;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    overflow: hidden;
+}
+
+#app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+/* Sidebar Glassmorphism */
+#sidebar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    bottom: 20px;
+    width: 320px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Custom Scrollbar */
+#sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+#sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+#sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text-main);
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.layer-control {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.layer-control h3 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.layer-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.layer-option:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.layer-option input[type="radio"],
+.layer-option input[type="checkbox"] {
+    appearance: none;
+    background-color: transparent;
+    margin-right: 12px;
+    font-size: inherit;
+    color: currentColor;
+    width: 1.15em;
+    height: 1.15em;
+    border: 2px solid var(--text-muted);
+    border-radius: 0.25em;
+    display: grid;
+    place-content: center;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.layer-option input[type="radio"] {
+    border-radius: 50%;
+}
+
+.layer-option input[type="radio"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--primary-color);
+}
+
+.layer-option input[type="checkbox"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--primary-color);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.layer-option input[type="radio"]:checked::before,
+.layer-option input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+.layer-option input[type="radio"]:checked,
+.layer-option input[type="checkbox"]:checked {
+    border-color: var(--primary-color);
+}
+
+.layer-option label {
+    font-size: 0.95rem;
+    cursor: pointer;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* Feature Info Popup Styling */
+.popup-info-container {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.popup-info-container::-webkit-scrollbar {
+    width: 4px;
+}
+.popup-info-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.popup-info-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.footer-credits {
+    padding: 16px 24px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+/* Map specific styles */
+.map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+/* Leaflet Customizations for Dark Theme */
+.leaflet-control-zoom {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.leaflet-control-zoom a {
+    background-color: var(--panel-bg) !important;
+    color: var(--text-main) !important;
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: background-color 0.2s;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.leaflet-control-zoom a:last-child {
+    border-bottom: none !important;
+}
+
+.leaflet-popup-content-wrapper {
+    background: var(--panel-bg) !important;
+    color: var(--text-main) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+    background: var(--panel-bg) !important;
+}
+
+.leaflet-popup-content {
+    margin: 16px !important;
+    line-height: 1.5;
+}
+
+.leaflet-popup-content h4 {
+    margin: 0 0 8px 0;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.leaflet-popup-close-button {
+    color: var(--text-muted) !important;
+}
+
+/* Spinner Animation */
+.spinner {
+  animation: rotate 2s linear infinite;
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+  width: 20px;
+  height: 20px;
+}
+
+.spinner .path {
+  stroke: var(--primary-color);
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dash {
+  0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+
+.loading-indicator {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+}
+
+/* Label Visibility Based on Zoom */
+.zoom-talhao-hidden .talhao-label {
+    display: none !important;
+}
+
+.zoom-fazenda-hidden .fazenda-label-icon {
+    display: none !important;
+}
+
+/* Fazenda Labels */
+.fazenda-label-icon {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    pointer-events: none; /* Let clicks pass through to the polygons */
+    z-index: 1000 !important; /* Make sure they are above polygons */
+}
+
+/* Transparent Tooltips for Talhão Labels */
+.transparent-tooltip {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+}
+.transparent-tooltip::before {
+    display: none;
+}
+
+
+
+/* ====================== Route Tool ====================== */
+.route-instruction {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    min-height: 36px;
+    transition: color 0.3s;
+}
+
+.route-btn {
+    width: 100%;
+    padding: 9px 12px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.route-btn:hover {
+    background: linear-gradient(135deg, #1e40af, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+}
+
+.route-btn-danger {
+    background: linear-gradient(135deg, #991b1b, #dc2626);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.route-btn-danger:hover {
+    background: linear-gradient(135deg, #7f1d1d, #991b1b);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+}
+
+#route-result {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.route-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    font-size: 0.8rem;
+}
+
+.route-info-row:last-child {
+    border-bottom: none;
+}
+
+.route-info-row span {
+    color: #94a3b8;
+}
+
+.route-info-row strong {
+    color: #f1f5f9;
+    font-weight: 600;
+    max-width: 55%;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Hide default Leaflet Routing Machine panel */
+.leaflet-routing-container {
+    display: none !important;
+}
+
+/* ====================== GPS Track Tool ====================== */
+.track-stats {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+}
+
+/* Pulsing GPS dot on the map */
+.gps-pulse-outer {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: gps-ripple 1.5s ease-out infinite;
+}
+.gps-pulse-inner {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 2px solid white;
+    box-shadow: 0 0 6px rgba(239,68,68,0.8);
+}
+@keyframes gps-ripple {
+    0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+    70%  { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* ====================== GPS Measurement Tool ====================== */
+.measure-mode-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.measure-mode-btn {
+    flex: 1;
+    padding: 7px 6px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #94a3b8;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.measure-mode-btn:hover {
+    background: rgba(255,255,255,0.12);
+    color: #e2e8f0;
+}
+
+.measure-mode-btn.active {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    border-color: #3b82f6;
+    color: white;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.measure-result-box {
+    background: linear-gradient(135deg, rgba(30,58,138,0.4), rgba(109,40,217,0.4));
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#measure-result-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+#measure-result-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}

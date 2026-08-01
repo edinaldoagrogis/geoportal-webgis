@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GeoPortal WebGIS</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-measure/dist/leaflet-measure.css" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="glass-panel">
+            <header class="sidebar-header">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                    <h1>GeoPortal</h1>
+                </div>
+                <p class="subtitle">Sistema de Informações Geográficas</p>
+            </header>
+
+            <div class="layer-control">
+                <h3>Camadas Base</h3>
+                <div class="layer-option">
+                    <input type="radio" id="base-satellite" name="base-layer" value="satellite" checked>
+                    <label for="base-satellite">Satélite (Esri World Imagery)</label>
+                </div>
+                <div class="layer-option">
+                    <input type="radio" id="base-street" name="base-layer" value="street">
+                    <label for="base-street">Ruas (OpenStreetMap)</label>
+                </div>
+                <div class="layer-option">
+                    <input type="radio" id="base-dark" name="base-layer" value="dark">
+                    <label for="base-dark">Modo Escuro (CartoDB)</label>
+                </div>
+            </div>
+
+            <!-- Track Recording Tool -->
+            <div class="layer-control">
+                <h3>🟥 Gravar Trilha GPS</h3>
+                <div id="track-tool-panel">
+                    <p class="route-instruction" id="track-status">Pressione "Iniciar" para começar a gravar sua trilha em tempo real.</p>
+                    
+                    <div class="track-stats" id="track-stats" style="display:none;">
+                        <div class="route-info-row">
+                            <span>⏱️ Tempo:</span>
+                            <strong id="track-time">00:00</strong>
+                        </div>
+                        <div class="route-info-row">
+                            <span>📏 Distância:</span>
+                            <strong id="track-distance">0 m</strong>
+                        </div>
+                        <div class="route-info-row">
+                            <span>📍 Pontos:</span>
+                            <strong id="track-points">0</strong>
+                        </div>
+                    </div>
+
+                    <button id="btn-track-start" class="route-btn" style="background: linear-gradient(135deg,#991b1b,#dc2626)">
+                        🔴 Iniciar Gravação
+                    </button>
+                    <button id="btn-track-stop" class="route-btn" style="display:none; background: linear-gradient(135deg,#1d4ed8,#2563eb)">
+                        ⏹️ Parar Gravação
+                    </button>
+
+                    <div id="track-export" style="display:none; margin-top:8px;">
+                        <p style="font-size:0.75rem; color:#94a3b8; margin: 0 0 6px;">Exportar trilha:</p>
+                        <div style="display:flex; gap:6px;">
+                            <button id="btn-export-gpx" class="route-btn" style="flex:1; font-size:0.72rem; padding:7px 4px; background:linear-gradient(135deg,#065f46,#059669);">
+                                💾 GPX
+                            </button>
+                            <button id="btn-export-geojson" class="route-btn" style="flex:1; font-size:0.72rem; padding:7px 4px; background:linear-gradient(135deg,#1e3a8a,#1d4ed8);">
+                                💾 GeoJSON
+                            </button>
+                            <button id="btn-track-clear" class="route-btn route-btn-danger" style="flex:1; font-size:0.72rem; padding:7px 4px;">
+                                🗑️ Limpar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layer-control">
+                <h3>Camadas Vetoriais</h3>
+                <div class="layer-option">
+                    <input type="checkbox" id="layer-fazendas" name="vector-layer" checked>
+                    <label for="layer-fazendas">
+                        Base de Fazendas
+                        <span class="loading-indicator" id="fazendas-loading" style="display: none;">
+                            <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <!-- GPS Measurement Tool -->
+            <div class="layer-control">
+                <h3>📐 Medição GPS</h3>
+                <div id="gps-measure-panel">
+                    <!-- Mode toggle -->
+                    <div class="measure-mode-toggle">
+                        <button id="btn-mode-dist" class="measure-mode-btn active" data-mode="distance">📏 Distância</button>
+                        <button id="btn-mode-area" class="measure-mode-btn" data-mode="area">⬡ Área</button>
+                    </div>
+
+                    <p class="route-instruction" id="gps-measure-status">Escolha o modo e pressione Iniciar. Caminhe pelo terreno para capturar os pontos automaticamente.</p>
+
+                    <!-- Live result display -->
+                    <div class="measure-result-box" id="measure-result-box" style="display:none;">
+                        <div id="measure-result-value">—</div>
+                        <div id="measure-result-label">—</div>
+                    </div>
+
+                    <!-- Stats row -->
+                    <div class="track-stats" id="measure-stats" style="display:none;">
+                        <div class="route-info-row">
+                            <span>📍 Pontos:</span>
+                            <strong id="measure-points">0</strong>
+                        </div>
+                        <div class="route-info-row" id="measure-accuracy-row">
+                            <span>🎯 Precisão GPS:</span>
+                            <strong id="measure-accuracy">—</strong>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div style="display:flex; gap:6px; margin-bottom:6px;">
+                        <button id="btn-gps-measure-start" class="route-btn" style="flex:1; background:linear-gradient(135deg,#065f46,#059669);">
+                            ▶ Iniciar
+                        </button>
+                        <button id="btn-gps-add-point" class="route-btn" style="flex:1; display:none; background:linear-gradient(135deg,#92400e,#d97706);">
+                            📍 + Ponto
+                        </button>
+                    </div>
+                    <button id="btn-gps-measure-stop" class="route-btn" style="display:none; background:linear-gradient(135deg,#1d4ed8,#2563eb);">
+                        ⏹ Finalizar Medição
+                    </button>
+                    <button id="btn-gps-measure-clear" class="route-btn route-btn-danger" style="display:none; margin-top:4px;">
+                        🗑️ Limpar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Route Tool -->
+            <div class="layer-control">
+                <h3>🚗 Ferramenta de Rota</h3>
+                <div id="route-tool-panel">
+                    <p class="route-instruction" id="route-status">Clique em "Iniciar Rota" e selecione dois polígonos no mapa.</p>
+                    <button id="btn-route-start" class="route-btn">📍 Iniciar Rota</button>
+                    <button id="btn-route-clear" class="route-btn route-btn-danger" style="display:none;">🗑️ Limpar Rota</button>
+                    <div id="route-result" style="display:none;">
+                        <div class="route-info-row">
+                            <span>📏 Distância:</span>
+                            <strong id="route-distance">—</strong>
+                        </div>
+                        <div class="route-info-row">
+                            <span>⏱️ Tempo:</span>
+                            <strong id="route-time">—</strong>
+                        </div>
+                        <div class="route-info-row">
+                            <span>🟢 Origem:</span>
+                            <strong id="route-origin-name">—</strong>
+                        </div>
+                        <div class="route-info-row">
+                            <span>🔴 Destino:</span>
+                            <strong id="route-dest-name">—</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                <p>&copy; 2026 GeoPortal. Todos os direitos reservados.</p>
+            </div>
+        </aside>
+
+        <!-- Map Container -->
+        <main id="map" class="map-container"></main>
+        
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-measure/dist/leaflet-measure.js"></script>
+    <!-- Leaflet Routing Machine (for road routing via OSRM) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+
+    <!-- Data -->
+    <script src="CAMADAS/BASE_FAZENDAS.js"></script>
+    <!-- Main JavaScript -->
+    <script src="main.js"></script>
+
+    <!-- Service Worker Registration for Offline Mode -->
+    <script>
+        // Redirect unauthenticated users to login page
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'login.html';
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

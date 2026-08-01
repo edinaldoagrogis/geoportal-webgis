@@ -1,0 +1,16 @@
+{
+  "name": "Geoportal WebGIS",
+  "short_name": "Geoportal",
+  "description": "Sistema de Informação Geográfica Offline",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Leaflet_logo.svg/1024px-Leaflet_logo.svg.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
