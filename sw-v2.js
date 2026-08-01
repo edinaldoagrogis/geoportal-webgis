@@ -5,14 +5,15 @@ const TILE_CACHE = 'map-tiles-cache';
 const PRECACHE_ASSETS = [
     './',
     './index.html',
-    './style.css',
+    './style.css?v=2',
     './main.js',
     './CAMADAS/BASE_FAZENDAS.js',
-    // Leaflet CDNs
+    './login.html',
+    './login.css',
+    './login.js',
+    './manifest.json',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-    'https://unpkg.com/leaflet-measure@3.1.0/dist/leaflet-measure.css',
-    'https://unpkg.com/leaflet-measure@3.1.0/dist/leaflet-measure.js'
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -30,6 +31,7 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME && cacheName !== TILE_CACHE) {
+                        console.log('Purging old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
@@ -50,12 +52,9 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             caches.open(TILE_CACHE).then(async (cache) => {
                 const cachedResponse = await cache.match(event.request);
-                // Return cached tile if it exists
                 if (cachedResponse) {
                     return cachedResponse;
                 }
-                
-                // Otherwise fetch from network and cache it for offline use
                 try {
                     const networkResponse = await fetch(event.request);
                     if (networkResponse.ok) {
@@ -63,7 +62,6 @@ self.addEventListener('fetch', (event) => {
                     }
                     return networkResponse;
                 } catch (error) {
-                    // Offline and tile not in cache, let it fail gracefully
                     return new Response('', { status: 408, statusText: 'Offline' });
                 }
             })
@@ -71,11 +69,10 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // 2. Default Strategy for App Assets: Network First, fallback to Cache
+    // 2. Default Strategy: Network First, fallback to Cache
     event.respondWith(
         fetch(event.request)
             .then((networkResponse) => {
-                // If it's a valid response from our app domain or CDNs, update cache
                 if (networkResponse.ok && (url.origin === location.origin || url.hostname.includes('unpkg.com'))) {
                     const clone = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => {
@@ -85,7 +82,6 @@ self.addEventListener('fetch', (event) => {
                 return networkResponse;
             })
             .catch(() => {
-                // Offline fallback
                 return caches.match(event.request);
             })
     );
