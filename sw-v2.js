@@ -1,4 +1,4 @@
-const CACHE_NAME = 'geoportal-v2-avenza';
+const CACHE_NAME = 'geoportal-v3-gps';
 const TILE_CACHE = 'map-tiles-cache';
 
 // Assets to cache immediately on install
@@ -7,6 +7,7 @@ const PRECACHE_ASSETS = [
     './index.html',
     './style.css?v=2',
     './main.js',
+    './gps-performance.js',
     './CAMADAS/BASE_FAZENDAS.js',
     './login.html',
     './login.css',

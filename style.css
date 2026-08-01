@@ -658,3 +658,63 @@ body {
     background: #1d4ed8;
     color: white;
 }
+
+/* Real-time Pulsing Blue GPS Marker (Google Maps / Avenza style) */
+.gps-user-marker {
+    background: transparent;
+    border: none;
+}
+
+.blue-dot-wrapper {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blue-dot-core {
+    width: 14px;
+    height: 14px;
+    background-color: #2563eb;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.8);
+    z-index: 2;
+}
+
+.blue-dot-pulse {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(37, 99, 235, 0.35);
+    border-radius: 50%;
+    animation: blue-pulse-anim 1.8s ease-out infinite;
+    z-index: 1;
+}
+
+@keyframes blue-pulse-anim {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* Active Follow state for GPS Button */
+.floating-gps-btn.active-follow {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 16px rgba(37, 99, 235, 0.7) !important;
+    animation: pulse-gps-btn 2s infinite;
+}
+
+@keyframes pulse-gps-btn {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
